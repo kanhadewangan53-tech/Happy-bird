@@ -110,6 +110,7 @@
     }
 
     #gameover-screen { display: none; }
+    #difficulty-screen { display: none; }
 
     .final-score {
       font-size: 1.3rem;
@@ -121,6 +122,122 @@
       color: #aaa;
       margin-top: 10px;
     }
+
+    /* ── Difficulty Screen ── */
+    #difficulty-screen {
+      background: rgba(10, 10, 30, 0.88);
+      border-radius: 18px;
+      padding: 26px 32px 28px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      border: 1.5px solid #f5d44240;
+      min-width: 290px;
+    }
+
+    .diff-subtitle {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .diff-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .diff-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 18px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      pointer-events: all;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+      text-align: left;
+    }
+    .diff-card:hover { transform: scale(1.03); }
+    .diff-card:active { transform: scale(0.97); }
+
+    .diff-card.easy   { background: rgba(46,204,113,0.12); border-color: #2ecc7188; }
+    .diff-card.medium { background: rgba(245,212,66,0.12); border-color: #f5d44288; }
+    .diff-card.hard   { background: rgba(231,76,60,0.12);  border-color: #e74c3c88; }
+    .diff-card.insane { background: rgba(155,89,182,0.12); border-color: #9b59b688; }
+
+    .diff-card.easy:hover   { background: rgba(46,204,113,0.22); border-color: #2ecc71cc; }
+    .diff-card.medium:hover { background: rgba(245,212,66,0.22); border-color: #f5d442cc; }
+    .diff-card.hard:hover   { background: rgba(231,76,60,0.22);  border-color: #e74c3ccc; }
+    .diff-card.insane:hover { background: rgba(155,89,182,0.22); border-color: #9b59b6cc; }
+
+    .diff-icon {
+      font-size: 1.8rem;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .diff-info { flex: 1; }
+
+    .diff-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .diff-card.easy   .diff-name { color: #2ecc71; }
+    .diff-card.medium .diff-name { color: #f5d442; }
+    .diff-card.hard   .diff-name { color: #e74c3c; }
+    .diff-card.insane .diff-name { color: #9b59b6; }
+
+    .diff-desc {
+      font-size: 0.75rem;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    .diff-stars {
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+    }
+
+    .diff-best {
+      font-size: 0.72rem;
+      color: #666;
+      margin-top: 3px;
+    }
+
+    #back-btn {
+      background: transparent;
+      color: #aaa;
+      border: 1.5px solid #aaa4;
+      padding: 8px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      pointer-events: all;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    #back-btn:hover { color: #f5d442; border-color: #f5d44266; }
+
+    /* active difficulty badge during game */
+    #diff-badge {
+      position: absolute;
+      top: 18px;
+      right: 14px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      opacity: 0.85;
+    }
+    #diff-badge.easy   { background:#2ecc7130; color:#2ecc71; border:1px solid #2ecc7166; }
+    #diff-badge.medium { background:#f5d44230; color:#f5d442; border:1px solid #f5d44266; }
+    #diff-badge.hard   { background:#e74c3c30; color:#e74c3c; border:1px solid #e74c3c66; }
+    #diff-badge.insane { background:#9b59b630; color:#9b59b6; border:1px solid #9b59b666; }
   </style>
 </head>
 <body>
@@ -132,12 +249,63 @@
 
     <div id="ui-overlay">
       <div id="score-display">0</div>
+      <div id="diff-badge" class="easy" style="display:none">EASY</div>
 
       <div id="start-screen">
         <div class="screen-title">🐦 Flappy Bird</div>
         <div class="screen-sub">Tap or press Space to fly!</div>
-        <button class="btn" id="start-btn">▶ Start Game</button>
+        <button class="btn" id="start-btn">▶ Play Game</button>
         <div id="best-score">Best: 0</div>
+      </div>
+
+      <!-- Difficulty Picker -->
+      <div id="difficulty-screen">
+        <div class="screen-title">⚙️ Difficulty</div>
+        <div class="diff-subtitle">Choose your challenge</div>
+        <div class="diff-cards">
+
+          <div class="diff-card easy" data-diff="easy">
+            <div class="diff-icon">🌿</div>
+            <div class="diff-info">
+              <div class="diff-name">EASY</div>
+              <div class="diff-desc">Wide gaps · Slow speed · Chill vibes</div>
+              <div class="diff-best" id="best-easy">Best: 0</div>
+            </div>
+            <div class="diff-stars">⭐</div>
+          </div>
+
+          <div class="diff-card medium" data-diff="medium">
+            <div class="diff-icon">🔥</div>
+            <div class="diff-info">
+              <div class="diff-name">MEDIUM</div>
+              <div class="diff-desc">Normal gaps · Standard speed</div>
+              <div class="diff-best" id="best-medium">Best: 0</div>
+            </div>
+            <div class="diff-stars">⭐⭐</div>
+          </div>
+
+          <div class="diff-card hard" data-diff="hard">
+            <div class="diff-icon">💀</div>
+            <div class="diff-info">
+              <div class="diff-name">HARD</div>
+              <div class="diff-desc">Narrow gaps · Fast speed · No mercy</div>
+              <div class="diff-best" id="best-hard">Best: 0</div>
+            </div>
+            <div class="diff-stars">⭐⭐⭐</div>
+          </div>
+
+          <div class="diff-card insane" data-diff="insane">
+            <div class="diff-icon">🌀</div>
+            <div class="diff-info">
+              <div class="diff-name">INSANE</div>
+              <div class="diff-desc">Tiny gaps · Blazing speed · Good luck</div>
+              <div class="diff-best" id="best-insane">Best: 0</div>
+            </div>
+            <div class="diff-stars">💜💜💜</div>
+          </div>
+
+        </div>
+        <button id="back-btn">← Back</button>
       </div>
 
       <div id="gameover-screen">
@@ -146,6 +314,8 @@
         <div id="best-score-go">Best: 0</div>
         <br/>
         <button class="btn" id="restart-btn">🔄 Restart</button>
+        <br/><br/>
+        <button id="change-diff-btn" style="background:transparent;color:#aaa;border:1.5px solid #aaa4;padding:7px 20px;font-size:0.85rem;font-weight:600;border-radius:50px;cursor:pointer;pointer-events:all;transition:color 0.15s,border-color 0.15s;">⚙️ Change Difficulty</button>
         <div class="hint">Space / Tap to fly</div>
       </div>
     </div>
@@ -158,10 +328,23 @@ const ctx = canvas.getContext('2d');
 const W = canvas.width;
 const H = canvas.height;
 
+// ─── Difficulty Settings ──────────────────────────────────────
+const DIFFICULTIES = {
+  easy:   { gap: 195, speed: 1.9, interval: 105, gravity: 0.38, flapPower: -7.8, label: 'EASY',   emoji: '🌿' },
+  medium: { gap: 155, speed: 2.6, interval: 90,  gravity: 0.45, flapPower: -8.5, label: 'MEDIUM', emoji: '🔥' },
+  hard:   { gap: 118, speed: 3.4, interval: 78,  gravity: 0.52, flapPower: -9.0, label: 'HARD',   emoji: '💀' },
+  insane: { gap: 90,  speed: 4.5, interval: 64,  gravity: 0.60, flapPower: -9.6, label: 'INSANE', emoji: '🌀' },
+};
+
+let currentDiff = 'medium';
+let diffConfig = DIFFICULTIES[currentDiff];
+
+// Per-difficulty best scores
+const bestScores = { easy: 0, medium: 0, hard: 0, insane: 0 };
+
 // ─── Game State ───────────────────────────────────────────────
-let state = 'start'; // 'start' | 'playing' | 'dead'
+let state = 'start'; // 'start' | 'difficulty' | 'playing' | 'dead'
 let score = 0;
-let bestScore = 0;
 let animId;
 
 // ─── Bird ─────────────────────────────────────────────────────
@@ -169,9 +352,6 @@ const BIRD = {
   x: 80, y: H / 2,
   r: 18,
   vel: 0,
-  gravity: 0.45,
-  flapPower: -8.5,
-  maxFall: 10,
   angle: 0,
   wingAngle: 0,
   wingDir: 1,
@@ -182,10 +362,10 @@ const BIRD = {
     this.wingAngle = 0;
   },
   flap() {
-    this.vel = this.flapPower;
+    this.vel = diffConfig.flapPower;
   },
   update() {
-    this.vel = Math.min(this.vel + this.gravity, this.maxFall);
+    this.vel = Math.min(this.vel + diffConfig.gravity, 10);
     this.y += this.vel;
     this.angle = Math.max(-25, Math.min(90, this.vel * 4));
     this.wingAngle += 0.3 * this.wingDir;
@@ -196,7 +376,6 @@ const BIRD = {
     ctx.translate(this.x, this.y);
     ctx.rotate((this.angle * Math.PI) / 180);
 
-    // Body (yellow circle)
     ctx.fillStyle = '#f5d442';
     ctx.shadowColor = '#f5d44288';
     ctx.shadowBlur = 14;
@@ -205,7 +384,6 @@ const BIRD = {
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // Wing
     ctx.save();
     ctx.translate(-4, 2);
     ctx.rotate(this.wingAngle * 1.2);
@@ -215,19 +393,16 @@ const BIRD = {
     ctx.fill();
     ctx.restore();
 
-    // Eye white
     ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.ellipse(8, -5, 7, 7, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Pupil
     ctx.fillStyle = '#222';
     ctx.beginPath();
     ctx.ellipse(10, -4, 3.5, 3.5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Beak
     ctx.fillStyle = '#f07020';
     ctx.beginPath();
     ctx.moveTo(14, -1);
@@ -237,7 +412,6 @@ const BIRD = {
     ctx.closePath();
     ctx.fill();
 
-    // Cheek blush
     ctx.fillStyle = '#ff888844';
     ctx.beginPath();
     ctx.ellipse(5, 3, 5, 3, 0, 0, Math.PI * 2);
@@ -249,25 +423,23 @@ const BIRD = {
 
 // ─── Pipes ────────────────────────────────────────────────────
 const PIPE_W = 62;
-const PIPE_GAP = 155;
-const PIPE_SPEED = 2.6;
 let pipes = [];
 let pipeTimer = 0;
-const PIPE_INTERVAL = 90;
 
 function addPipe() {
-  const minY = 90;
-  const maxY = H - 90 - PIPE_GAP;
+  const gap = diffConfig.gap;
+  const minY = 80;
+  const maxY = H - 80 - gap;
   const topH = Math.floor(Math.random() * (maxY - minY) + minY);
   pipes.push({ x: W + PIPE_W, topH, passed: false });
 }
 
 function drawPipe(x, topH) {
+  const gap = diffConfig.gap;
   const capW = PIPE_W + 12;
   const capH = 24;
   const radius = 6;
 
-  // Top pipe body
   const tGrad = ctx.createLinearGradient(x, 0, x + PIPE_W, 0);
   tGrad.addColorStop(0, '#2ecc71');
   tGrad.addColorStop(0.5, '#27ae60');
@@ -275,7 +447,6 @@ function drawPipe(x, topH) {
   ctx.fillStyle = tGrad;
   ctx.fillRect(x, 0, PIPE_W, topH - capH);
 
-  // Top pipe cap
   const capX = x - (capW - PIPE_W) / 2;
   ctx.fillStyle = '#27ae60';
   ctx.beginPath();
@@ -285,8 +456,7 @@ function drawPipe(x, topH) {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Bottom pipe body
-  const botTop = topH + PIPE_GAP;
+  const botTop = topH + gap;
   const bGrad = ctx.createLinearGradient(x, 0, x + PIPE_W, 0);
   bGrad.addColorStop(0, '#2ecc71');
   bGrad.addColorStop(0.5, '#27ae60');
@@ -294,7 +464,6 @@ function drawPipe(x, topH) {
   ctx.fillStyle = bGrad;
   ctx.fillRect(x, botTop + capH, PIPE_W, H - botTop - capH);
 
-  // Bottom pipe cap
   ctx.fillStyle = '#27ae60';
   ctx.beginPath();
   ctx.roundRect(capX, botTop, capW, capH, radius);
@@ -303,7 +472,6 @@ function drawPipe(x, topH) {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Pipe shine
   ctx.fillStyle = 'rgba(255,255,255,0.1)';
   ctx.fillRect(x + 6, 0, 10, topH - capH);
   ctx.fillRect(x + 6, botTop + capH, 10, H - botTop - capH);
@@ -333,7 +501,6 @@ function drawCloud(x, y, s) {
 }
 
 function drawBackground() {
-  // Sky gradient
   const sky = ctx.createLinearGradient(0, 0, 0, H);
   sky.addColorStop(0, '#0f3460');
   sky.addColorStop(0.6, '#16213e');
@@ -341,21 +508,18 @@ function drawBackground() {
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, H);
 
-  // Clouds (slow parallax)
   bgOffset = (bgOffset + 0.3) % W;
   for (const c of cloudData) {
     const cx = ((c.x - bgOffset * 0.4 + W) % (W + 80)) - 40;
     drawCloud(cx, c.y, c.s);
   }
 
-  // Ground
   const grd = ctx.createLinearGradient(0, H - 60, 0, H);
   grd.addColorStop(0, '#5c4a1e');
   grd.addColorStop(1, '#3d2f0d');
   ctx.fillStyle = grd;
   ctx.fillRect(0, H - 60, W, 60);
 
-  // Grass strip
   ctx.fillStyle = '#4caf50';
   ctx.fillRect(0, H - 62, W, 10);
   ctx.fillStyle = '#388e3c';
@@ -366,7 +530,8 @@ function drawBackground() {
 function checkCollision(pipe) {
   const bx = BIRD.x, by = BIRD.y, br = BIRD.r - 4;
   const px = pipe.x, topH = pipe.topH;
-  const botTop = topH + PIPE_GAP;
+  const gap = diffConfig.gap;
+  const botTop = topH + gap;
 
   const inXRange = bx + br > px - 6 && bx - br < px + PIPE_W + 6;
   if (inXRange) {
@@ -407,10 +572,25 @@ function updateParticles() {
   }
 }
 
-// ─── Score display ─────────────────────────────────────────────
+// ─── Score & badge ────────────────────────────────────────────
 const scoreEl = document.getElementById('score-display');
-function updateScoreDisplay() {
-  scoreEl.textContent = score;
+const diffBadge = document.getElementById('diff-badge');
+
+function updateScoreDisplay() { scoreEl.textContent = score; }
+
+function showDiffBadge() {
+  diffBadge.textContent = diffConfig.emoji + ' ' + diffConfig.label;
+  diffBadge.className = currentDiff;
+  diffBadge.style.display = 'block';
+}
+
+function hideDiffBadge() { diffBadge.style.display = 'none'; }
+
+function refreshDiffBestLabels() {
+  for (const d of Object.keys(bestScores)) {
+    const el = document.getElementById('best-' + d);
+    if (el) el.textContent = 'Best: ' + bestScores[d];
+  }
 }
 
 // ─── Flash overlay ─────────────────────────────────────────────
@@ -432,13 +612,13 @@ function loop() {
     BIRD.update();
 
     pipeTimer++;
-    if (pipeTimer >= PIPE_INTERVAL) {
+    if (pipeTimer >= diffConfig.interval) {
       addPipe();
       pipeTimer = 0;
     }
 
     for (const pipe of pipes) {
-      pipe.x -= PIPE_SPEED;
+      pipe.x -= diffConfig.speed;
       drawPipe(pipe.x, pipe.topH);
 
       if (!pipe.passed && pipe.x + PIPE_W < BIRD.x) {
@@ -474,14 +654,15 @@ function killBird() {
   flash = 0.7;
   spawnParticles();
 
-  if (score > bestScore) bestScore = score;
+  if (score > bestScores[currentDiff]) bestScores[currentDiff] = score;
+  refreshDiffBestLabels();
 
   document.getElementById('final-score-text').textContent = `Score: ${score}`;
-  document.getElementById('best-score-go').textContent = `Best: ${bestScore}`;
-  document.getElementById('best-score').textContent = `Best: ${bestScore}`;
+  document.getElementById('best-score-go').textContent =
+    `${diffConfig.emoji} Best (${diffConfig.label}): ${bestScores[currentDiff]}`;
   document.getElementById('gameover-screen').style.display = 'block';
+  hideDiffBadge();
 
-  // Draw a few more frames for particles
   let extra = 0;
   function deathLoop() {
     ctx.clearRect(0, 0, W, H);
@@ -496,7 +677,15 @@ function killBird() {
   deathLoop();
 }
 
-// ─── Start / Restart ─────────────────────────────────────────
+// ─── Screen Helpers ───────────────────────────────────────────
+function showScreen(id) {
+  const screens = ['start-screen', 'difficulty-screen', 'gameover-screen'];
+  screens.forEach(s => {
+    document.getElementById(s).style.display = s === id ? 'block' : 'none';
+  });
+}
+
+// ─── Start Game ───────────────────────────────────────────────
 function startGame() {
   cancelAnimationFrame(animId);
   score = 0;
@@ -507,9 +696,33 @@ function startGame() {
   BIRD.reset();
   state = 'playing';
   updateScoreDisplay();
-  document.getElementById('start-screen').style.display = 'none';
-  document.getElementById('gameover-screen').style.display = 'none';
+  showScreen(null);
+  showDiffBadge();
   loop();
+}
+
+// ─── Open Difficulty Screen ───────────────────────────────────
+function openDifficultyScreen() {
+  cancelAnimationFrame(animId);
+  state = 'difficulty';
+  refreshDiffBestLabels();
+  showScreen('difficulty-screen');
+  // keep idle animation running behind
+  idleTick();
+}
+
+// ─── Go Back to Start ─────────────────────────────────────────
+function goToStart() {
+  state = 'start';
+  showScreen('start-screen');
+  idleLoop();
+}
+
+// ─── Select Difficulty ────────────────────────────────────────
+function selectDifficulty(diff) {
+  currentDiff = diff;
+  diffConfig = DIFFICULTIES[diff];
+  startGame();
 }
 
 // ─── Input ────────────────────────────────────────────────────
@@ -517,13 +730,22 @@ function handleInput() {
   if (state === 'playing') BIRD.flap();
 }
 
-document.getElementById('start-btn').addEventListener('click', startGame);
-document.getElementById('restart-btn').addEventListener('click', startGame);
+document.getElementById('start-btn').addEventListener('click', openDifficultyScreen);
+document.getElementById('restart-btn').addEventListener('click', () => selectDifficulty(currentDiff));
+document.getElementById('back-btn').addEventListener('click', goToStart);
+document.getElementById('change-diff-btn').addEventListener('click', openDifficultyScreen);
+
+document.querySelectorAll('.diff-card').forEach(card => {
+  card.addEventListener('click', () => selectDifficulty(card.dataset.diff));
+});
 
 document.addEventListener('keydown', e => {
   if (e.code === 'Space' || e.code === 'ArrowUp') {
     e.preventDefault();
     if (state === 'playing') handleInput();
+  }
+  if (e.code === 'Escape') {
+    if (state === 'difficulty') goToStart();
   }
 });
 
@@ -536,15 +758,25 @@ canvas.addEventListener('touchstart', e => {
   if (state === 'playing') handleInput();
 }, { passive: false });
 
-// ─── Idle animation on start screen ──────────────────────────
-function idleLoop() {
+// ─── Idle animation ───────────────────────────────────────────
+let idleAnimId;
+function idleTick() {
+  cancelAnimationFrame(idleAnimId);
   ctx.clearRect(0, 0, W, H);
   drawBackground();
   BIRD.y = H / 2 + Math.sin(Date.now() / 400) * 14;
   BIRD.wingAngle += 0.08;
   BIRD.draw();
-  if (state === 'start') requestAnimationFrame(idleLoop);
+  if (state === 'start' || state === 'difficulty') {
+    idleAnimId = requestAnimationFrame(idleTick);
+  }
 }
+
+function idleLoop() {
+  cancelAnimationFrame(idleAnimId);
+  idleTick();
+}
+
 idleLoop();
 </script>
 </body>
